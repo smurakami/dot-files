@@ -5,7 +5,9 @@ neobundle.vim
 neocomplcache
 pyflakes-vim
 supertab
+tcomment_vim
 unite.vim
+vim-autoclose
 vim-vcs
 vimfiler
 vimshell
