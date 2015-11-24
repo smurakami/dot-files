@@ -1,0 +1,150 @@
+# Path to your oh-my-zsh installation.
+export ZSH=$HOME/.oh-my-zsh
+
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+ZSH_THEME="robbyrussell"
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+export PATH="/Users/smurakami/lib/vlfeat/bin/maci64/:/usr/local/mysql/bin:/Users/smurakami/lib/bin/:/Users/smurakami/.rbenv/shims:/Applications/gnuplot.app:/Applications/gnuplot.app/bin:/opt/local/lib/mysql5/bin/:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/texbin"
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
+
+# ssh
+# export SSH_KEY_PATH="~/.ssh/dsa_id"
+
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+#
+
+
+########################################
+# 個人的な設定
+export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=/opt/local/lib/mysql5/bin/:$PATH
+export PATH=/Applications/gnuplot.app:/Applications/gnuplot.app/bin:$PATH
+export PATH="$HOME/.rbenv/shims:$PATH"
+export PATH=~/lib/bin/:$PATH
+export PATH=/usr/local/mysql/bin:$PATH
+export PATH=~/lib/vlfeat/bin/maci64/:$PATH
+export PATH=/usr/local/Cellar/cabal-install/1.20.0.3_1/bin:$PATH
+
+export MANPATH=/opt/local/share/man:/opt/local/man:$MANPATH
+export PYTHONPATH=/usr/local/Cellar/opencv/2.4.9/lib/python2.7/site-packages/:$PYTHONPATH
+export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=~/lib/yael:$PYTHONPATH
+
+export conol=~/Dropbox/インターン共有
+export gp_game=~/dev/of_v0.8.0_osx_release/apps/myApps/GPGame/
+export macbookair=/Volumes/MOYASHI_HDD/MOYASHI/macbook-air/
+alias g='git'
+alias s='subl'
+alias v='vim'
+alias pyserver='python -m SimpleHTTPServer'
+alias py='python2.7'
+alias bpy='bpython'
+alias pynote='ipython notebook'
+alias rb='ruby'
+alias hs='ghc'
+alias ihs='ghci'
+alias localenv='RAILS_ENV=local'
+alias be='bundle exec'
+alias javac='env LC_ALL=en javac'
+alias x='xargs'
+alias markdown-previewer='open ~/dev/markdown-previewer/index.html'
+alias pupil_player='python ~/cv/pupil/pupil-github/pupil_src/player/main.py'
+
+# google
+
+google(){
+    if [ $(echo $1 | egrep "^-[cfs]$") ]; then
+        local opt="$1"
+        shift
+    fi
+    local url="https://www.google.co.jp/search?q=${*// /+}"
+    local app="/Applications"
+    local c="${app}/Google Chrome.app"
+    local f="${app}/Firefox.app"
+    local s="${app}/Safari.app"
+    case ${opt} in
+        "-c")   open "${url}" -a "$c";;
+        "-f")   open "${url}" -a "$f";;
+        "-s")   open "${url}" -a "$s";;
+        *)      open "${url}";;
+    esac
+}
+
+# less with color 
+export LESS='-R'
+export LESSOPEN='| /usr/local/bin/src-hilite-lesspipe.sh %s'
+
+# FOR DARUMA DEVELOPMENT
+
+DARUMA_FACEBOOK_KEY='546333358847736'
+DARUMA_FACEBOOK_SECRET='a4ee7bf1fff3a7b10d3e26f19eaeed60'
+
+
