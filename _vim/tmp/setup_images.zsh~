@@ -1,0 +1,2 @@
+extractbb images/*.pdf
+extractbb images/*.ai

@@ -1,0 +1,9 @@
+cd dir_a
+pwd
+cd ..
+cd dir_b
+pwd
+cd ..
+cd dir-c
+pwd
+

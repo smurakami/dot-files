@@ -1,0 +1,31 @@
+import glob
+import commands
+import numpy as np
+
+
+def main():
+    result = np.load('result.npy').item()
+    score = result['file_score']
+    success = [[] for _ in range(12)]
+    fail = [[] for _ in range(12)]
+    for filename, value in score.items():
+        elems = filename.split('/') 
+        action = int(elems[5].replace('action_', ''))
+        identifiler = elems[6]
+        # print action
+        video = glob.glob("out_video_all/*%s.mp4" % identifiler)
+        if len(video) == 0:
+            continue
+        video = video[0]
+        if value == 1:
+            success[action].append(video)
+        elif value == -1:
+            fail[action].append(video)
+
+    for action, files in enumerate(success):
+        args = ' '.join(["-i %s" % f for f in files])
+        commands.getoutput("ffmpeg %s -filter_complex 'concat=n=%d:v=1:a=0' success_action_%02d.mp4" % (args, len(files), action))
+
+        
+main()
+

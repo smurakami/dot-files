@@ -1,0 +1,16 @@
+from figure import Figure
+import commands
+
+def main():
+    pngfiles = commands.getoutput('find images -name "*.png"')
+    print pngfiles
+
+    return
+    figure = Figure('okamura.png')
+    figure.saveJSON('out.json')
+    figure.saveTestPNG('okamura_test.png')
+    commands.getoutput('open okamura_test.png')
+
+main()
+
+

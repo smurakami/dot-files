@@ -1,0 +1,88 @@
+\section{実装}
+\label{sec:implementation}
+本章では，提案手法の評価のために作成したシステムの実装の詳細について説明する．
+
+\subsection{局所特徴の生成}
+\label{imp_local_feat}
+本研究では，映像からの局所特徴の生成に第\ref{sec:related/action_recog}節で説明したTDD\cite{TDD}を採用した．
+TDDではdense trajectoriesにより映像中に現れる特徴点を追跡し，その軌跡上の特徴マップを局所特徴として用いる．
+入力映像のサイズを320px $\times$ 180px，フレームレートを30fpsとする．
+dense trajectoriesの生成の際には，映像の5フレームごとに画面全体から特徴点を選択し，各特徴点から軌跡を生成した．
+特徴点の生成の際には8px間隔のグリッド上に特徴点の初期位置を配置し，その中で追跡可能なものを選択した上でoptical flow\cite{Horn81determiningoptical}により追跡した．
+
+生成された特徴点が追跡可能であるかどうかの判定にはGood Features to Trackで提案された手法\cite{good_features_to_track}を採用した．
+この手法では特徴点の生成の際に初期位置の勾配行列の最小固有値を計算することにより，その特徴点が追跡可能であるかどうか評価する．
+この最小固有値が一定の値に満たない場合，特徴点は模様のない壁などの追跡することができない領域にあると判定する．
+提案手法では，この固有値の評価の際に，勾配行列の固有値の閾値を$10^{-4}$に設定し特徴点の選定を行った．
+また，optical flowの生成にはFarnebackのアルゴリズム\cite{optical_flow_farneback}を採用し，Dense trajectoriesの長さは15フレームとした．
+
+特徴マップの生成にはWangら\cite{TDD}により開発されたCNNモデル\footnote{https://github.com/wanglimin/TDD}を使用した．
+WangらによるCNNモデルの構成を表\ref{tab:wang_tcnn}に示す．
+Wangらは，spatial netとtemporal netの両方で同じ構成のCNNを用いた．
+CNNの学習のための教師データにはUCF101\cite{UCF101}データセットが用いられている．
+TDDではspatial netとtemporal netで各フレームの画像とoptical flow入力をそれぞれ入力とし，その中間データを特徴マップとして用いる．
+中間データの利用に際しては，文献\cite{TDD}を参考に画像の特徴マップには{\bf conv4}層の出力を，optical flowの特徴マップには{\bf conv3}層の出力を採用した．
+
+\begin{table}[h]
+    \begin{center}
+        \caption[TDDで使用したCNNのモデル構成]{TDDで使用したCNNのモデル構成(Wang et al. \cite{TDD} より)}
+        \label{tab:wang_tcnn}
+        \begin{tabular}{|c||c c c|c c|}
+            \hline
+            Layer & size & stride & channel & map size ratio & receptive field \\ \hline \hline
+            conv1 & 7×7 & 2 & 96 & 1/2 & 7×7 \\ \hline
+            pool1 & 3×3 & 2 & 96 & 1/4 & 11 × 11 \\ \hline
+            conv2 & 5×5 & 2 & 256 & 1/8 & 27 × 27 \\ \hline
+            pool2 & 3×3 & 2 & 256 & 1/16 & 43×43 \\ \hline
+            conv3 & 3×3 & 1 & 512 & 1/16 & 75×75 \\ \hline
+            conv4 & 3×3 & 1 & 512 & 1/16 & 107 × 107 \\ \hline
+            conv5 & 3×3 & 1 & 512 & 1/16 & 139 × 139 \\ \hline
+            pool5 & 3×3 & 2 & 512 & 1/32 & 171 × 171 \\ \hline
+            full6 & - & - & 4096 & - & - \\ \hline
+            full7 & - & - & 2048 & - & - \\ \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\subsection{視線情報の利用}
+提案手法では局所特徴の重み付けに視線位置の情報を用いる．
+視線情報の収集には，収録にはPupil Labs社のPupil Pro\footnote{http://pupil-labs.com}を使用した．
+
+提案手法には視線からどの程度の距離を視線周辺領域にするかという半径$r$と，視線領域との重複時間がどの程度の局所特徴を選択するかという閾値$q$の二つのパラメタが存在する．
+そこでこの二つのパラメタを様々に変えた上で，認識精度が最も高くなるような変数の組み合わせを提案手法のパラーメータとして決定した．
+これらのパラメタは交差検定で決定した．
+交差検定の結果と採用した値に関しては第\ref{sec:experiment}章で説明する．
+
+\subsection{Fisher vectorによる識別}
+\label{imp_fisher_vector}
+
+提案手法では，線形識別器で効率的に学習を行うためにFisher vectorにより高次特徴を生成する．
+
+\ref{imp_local_feat}の項で特徴マップの生成に使用したCNNのconv4層，conv3層はそれぞれ512のチャネルから構成される．
+この特徴からdense trajectoriesにより集められる局所特徴はspatial netのconv4層とtemporal netのconv 3層のチャネル数を合わせた1024次元となる．
+
+Fisher vectorではGaussian mixture modelの共分散成分を考慮していないため，特徴次元間に相関がないことを仮定している．
+そのため，Wangらの研究\cite{TDD}では，局所特徴をそのままFisher vectorに適用するよりも主成分分析により次元削減をし，特徴次元間の相関を無くした上でFisher vectorを生成した．
+提案手法においても，主成分分析により局所特徴の次元を1024次元から64次元に削減した上でFisher vectorを作成した．
+
+Gaussian mixture modelの学習の際には，Wangらの手法に基づきコンポーネント数$K = 256$として学習を行った．
+最終的に，生成されたFisher vectorは$64 \times 2 \times 256 = 32768$次元となった．
+
+生成されたFisher vectorは，Florentらの手法\cite{improved_fisher}を用いて正規化した上で使用した．
+この手法では，Fisher vector $\bm x \in \mathbb R ^ d$に対してL2正規化
+$$
+f (x _i) = \frac{x _i }{ \sqrt{ \sum _k ^d x _k ^ 2 } }
+$$
+とpower正規化
+$$
+g (x _i) = \mathrm {sign}(x _i) |x _i| ^ \alpha
+$$
+を適用する．
+このようにすることでFisher vectorによる学習の精度が向上することが示されている\cite{improved_fisher}．
+本研究では$\alpha = 0.5$とした．
+
+識別の際にはサポートベクタマシンを用いた．
+また，最終的には12種類の多クラス分類を行う必要があったため，one vs one classifierを用いることで多クラス分類を行った．
+
+\newpage
+

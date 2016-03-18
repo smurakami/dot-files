@@ -1,0 +1,139 @@
+\documentclass[12pt]{jarticle}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{setspace}
+
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage[hang,small,bf]{caption}
+\usepackage[subrefformat=parens]{subcaption}
+\definecolor{yellow}{rgb}{1,1,0}
+
+\setlength{\topmargin}{30mm}
+\addtolength{\topmargin}{-1in}
+\setlength{\oddsidemargin}{30mm}
+\addtolength{\oddsidemargin}{-1in}
+\setlength{\evensidemargin}{20mm}
+\addtolength{\evensidemargin}{-1in}
+\setlength{\textwidth}{150mm}
+\setlength{\textheight}{225mm}
+\setlength{\headsep}{0mm}
+\setlength{\headheight}{0mm}
+\setlength{\topskip}{0mm}
+\setstretch{1.1}
+
+\newtheorem{theorem}{定理}[section]
+\newtheorem{definittion}{定義}[section]
+
+\newcommand{\argmax}{\mathop{\rm argmax}\limits}
+\newcommand{\argmin}{\mathop{\rm argmin}\limits}
+
+% ソースコード貼付け用の設定
+% \usepackage{caption}
+% \captionsetup[lstlisting]{font={small,tt}}
+% \lstset{%
+%   language={Python},
+%   basicstyle={\small},%
+%   identifierstyle={\small},%
+%   commentstyle={\small\itshape},%
+%   keywordstyle={\small\bfseries},%
+%   ndkeywordstyle={\small},%
+%   stringstyle={\small\ttfamily},
+%   frame={tb},
+%   breaklines=true,
+%   columns=[l]{fullflexible},%
+%   numbers=left,%
+%   xrightmargin=0zw,%
+%   xleftmargin=3zw,%
+%   numberstyle={\scriptsize},%
+%   stepnumber=1,
+%   numbersep=1zw,%
+%   lineskip=-0.5ex%
+% }
+
+\begin{document}
+
+\pagestyle{empty}
+\begin{center}
+  \vspace*{3.0cm}
+  {\fontsize{30pt}{0pt}\selectfont 修士学位論文}
+
+\vspace*{2.0cm}
+
+  \begin{LARGE}
+    {\fontsize{48pt}{0pt}\selectfont 
+        視線を利用した \\
+        \vspace*{1.0cm}
+        二人称視点動作認識
+    }
+    \vspace*{2.0cm}
+
+    平成 28 年 2 月 4 日提出
+  \end{LARGE}
+
+\end{center}
+
+\begin{LARGE}
+  \vspace*{1.0cm}
+
+  \begin{center}
+    東京大学大学院 情報理工学系研究科 \\
+    電子情報学専攻
+
+  \vspace{0.5cm}
+  48-146451\hspace{15mm}村上\,晋太郎
+
+  \vspace*{1.0cm}
+  指導教員\hspace{15mm}佐藤洋一\,教授
+
+  \end{center}
+
+\end{LARGE}
+
+\newpage
+
+\pagestyle{plain}
+\pagenumbering{roman}
+\section*{Abstract}
+
+近年，ウェアラブルカメラの普及に伴いカメラの装着者の視界を記録した一人称視点映像の利用が盛んになっている．
+一人称視点映像の中では，映像の記録者の視界に他の人物が映り込む場合がある．
+このようにして得られる映像を二人称視点映像と呼ぶ．
+ウェアラブルカメラでは，従来利用されてきた固定カメラ等と比較してより詳細な人物映像を得ることができる．
+そこで，本論文では二人称視点映像中での人物の動作認識に取り組む．
+
+従来の動作認識では，しばしば画面全体の動きから特徴量を生成するという手法が用いられてきた．
+しかしながら，二人称視点映像中では映像の観測者の頭部運動による背景の動きや第三者の映り込みにより，認識対象の動作とは関係のない動きの情報が特徴量に含まれてしまうことがある．
+このような問題を回避するためには，映像中で動作認識に重要な部位と重要でない部位を推定し，重要でない部位の影響を抑えつつ特徴量を扱うことが望ましい．
+
+一方，近年ユーザーの視線の向きを計測することができる視線計測機器が従来より安価かつ手軽に利用できるようになった．
+特にウェアラブルカメラと一体になった視線計測機器を用いることにより，一人称視点映像中でのカメラ装着者の視線位置を計測することが可能である．
+このような情報は，映像の記録者がどのような場所に注意を向けているのかといった情報を知る手がかりになる．
+
+そこで，本研究ではウェアラブルカメラと一体となった視線計測機器を用い，二人称視点映像の記録者の注視位置に基づいて映像の各位置に現れる動きの重要度を考慮しつつ特徴量を生成することで，
+動作認識の精度を向上させる手法を開発する．
+提案手法の評価のにあたって，視線データの付与された二人称視点映像データセットを構築した．
+実験の結果，視線データを利用することで動作の認識精度が向上することを確認した．
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\listoffigures
+
+\newpage
+
+\listoftables
+
+\newpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}

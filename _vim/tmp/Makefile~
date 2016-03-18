@@ -1,0 +1,35 @@
+DOCUMENT = final
+TEX = $(DOCUMENT)
+DVI = $(DOCUMENT).dvi
+LOG = $(DOCUMENT).log
+AUX = $(DOCUMENT).aux
+TOC = $(DOCUMENT).toc
+PDF = $(DOCUMENT).pdf
+
+all:
+	make normal
+normal:
+	bash join-src.bash >  $(TEX).tex
+	zsh setup_images.zsh
+	platex $(TEX)
+	pbibtex $(TEX)
+	dvipdfmx $(DVI)
+	open $(PDF)
+diff:
+	bash join-src.bash >  $(TEX).tex
+	ruby create_diff.rb $(TEX).tex draft-04-
+	zsh setup_images.zsh
+	platex diff
+	pbibtex diff
+	platex diff
+	pbibtex diff
+	dvipdfmx diff.dvi
+	open diff.pdf
+dvi:
+	platex $(TEX)
+
+clean:
+	rm $(DVI)
+	rm $(LOG)
+	rm $(AUX)
+	rm $(TOC)

@@ -8,6 +8,7 @@ supertab
 tcomment_vim
 unite.vim
 vim-autoclose
+vim-swift
 vim-vcs
 vimfiler
 vimshell

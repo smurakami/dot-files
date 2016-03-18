@@ -1,0 +1,9 @@
+cat src/head.tex
+cat src/intro.tex
+cat src/related.tex
+cat src/method.tex
+cat src/imple.tex
+cat src/dataset.tex
+cat src/experiment.tex
+cat src/conclusion.tex
+cat src/foot.tex

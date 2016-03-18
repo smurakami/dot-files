@@ -1,0 +1,104 @@
+import numpy as np
+import cv2
+import ipdb
+import sys
+import commands
+
+video_size = (320, 180)
+TRACK_LEN = 30
+
+
+class Trajectory:
+    def __init__(self, dat):
+        self.dat = dat
+
+    def traj(self):
+        return self.dat[:, -(TRACK_LEN * 2):]
+
+    def current_pos(self, frame_index):
+        age = self.__track_age(frame_index)
+        traj = self.traj()
+        range = np.arange(len(traj))
+        pos_x = traj[range, age*2]
+        pos_y = traj[range, age*2+1]
+        return np.vstack([pos_x, pos_y]).T
+
+    def current_traj(self, frame_index):
+        age = self.__track_age(frame_index)
+        traj = self.traj()
+
+        t = []
+
+        for i in range(len(traj)):
+            a = age[i]
+            xs = traj[i][0:(a*2+0):2]
+            ys = traj[i][1:(a*2+1):2]
+
+            t.append(np.vstack([xs, ys]).T)
+
+        return t
+
+    def overlaps(self, frame_index):
+        return Trajectory(self.dat[self.__overlaps_flg(frame_index)])
+
+    def __overlaps_flg(self, frame_index):
+        begin = self.dat[:, 0] - TRACK_LEN
+        end = self.dat[:, 0]
+
+        begin_flg = begin <= frame_index
+        end_flg = end > frame_index
+        return begin_flg & end_flg
+
+    def __track_age(self, frame_index):
+        return (frame_index - (self.dat[:, 0] - TRACK_LEN)).astype(int)
+
+
+def main():
+    if len(sys.argv) < 3:
+        print "usage: python %s movfile trajfile" % sys.argv[0]
+        return
+
+    # dat = np.loadtxt("sample/tracks/pan.dat")
+    # cap = cv2.VideoCapture("sample/movies/pan.mov")
+    cap = cv2.VideoCapture(sys.argv[1])
+    dat = np.loadtxt(sys.argv[2])
+    out = cv2.VideoWriter('out.avi', 0, 30, video_size)
+
+    # subsumpling
+
+    dat = dat[::]
+
+    traj_data = Trajectory(dat)
+    
+
+    while True:
+        frame_index = int(cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES))
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame = cv2.resize(frame, video_size)
+        overlaps = traj_data.overlaps(frame_index)
+        pos = overlaps.current_pos(frame_index)
+        traj = overlaps.current_traj(frame_index)
+
+        for t in traj:
+            t = t.astype(int)
+            for a, b in zip(t, t[1:]):
+                # cv2.circle(frame, (int(p[0]), int(p[1])), 3, (0, 0, 255), -1)
+                cv2.line(frame, tuple(a), tuple(b), (0, 0, 255), 1, cv2.cv.CV_AA)
+
+        for p in pos:
+            cv2.circle(frame, (int(p[0]), int(p[1])), 1, (0, 255, 0), 1, cv2.CV_AA)
+            
+
+        cv2.imshow('frame', frame)
+        out.write(frame)
+        cv2.waitKey(1)
+    out.release()
+
+    commands.getoutput('yes | ffmpeg -i out.avi out.mov')
+
+
+main()
+

@@ -1,0 +1,372 @@
+\section{提案手法}
+\label{sec:method}
+本章では，提案手法の詳細について述べる．
+図\ref{fig:overview}は，提案手法の概要を示したものである．
+提案手法では動作が起きるタイミングは既知のものであるとして，一つの動作が含まれた短い二人称視点映像についてその映像中でどのような動作が行われているかを識別する．
+入力映像の長さは動作の起点から動作の終了までの長さと大まかに等しくなるように編集されている．
+また，映像中には動作認識の対象となる人物が全フレームにわたって映り込んでいるように収録されている．
+映像の各フレームにはそのフレームが記録された時点での映像内での映像記録者の視線位置が与えられている．
+
+提案手法ではまず映像全体からtrajectory-pooled deep-convolutional descriptors(TDD)\cite{TDD}を用いて局所特徴群を抽出する．
+この局所特徴群は，各映像につき多数生成される．
+次に，視線情報を用いてそれぞれの局所特徴の重要度を推定し，局所特徴に重み付けを行う．
+重み付けされた局所特徴を用いることにより，Fisher vector(FV)\cite{fisher_vector}を用いて高次特徴量を生成する．
+高次特徴は，各映像につき一つ作成される．
+最終的に生成された映像特徴に線形識別器を利用した多クラス分類手法を適用することで，それぞれの映像に含まれる動作があらかじめ定義された動作の種類のうちどの種類に該当するのかを識別する．
+
+\begin{figure}
+\begin{center}
+    \includegraphics[width=13cm]{images/cvim_overview.ai}
+\end{center}
+\caption[提案手法の概要]{
+    提案手法の概要．
+    まず入力映像からtrajectory-pooled deep-convolutional descriptors\cite{TDD}を用いて局所特徴群を生成する．
+    この際に，convolutional neural networks\cite{CNN}を用いて生成された特徴マップを
+    dense trajectories\cite{wang2011, IDT}の軌跡に沿って抽出する．
+    次に，入力映像に付与された映像記録者の視線位置情報をもとに，生成された局所特徴に重み付けを行う．
+    このようにして生成された重みつきの局所登頂群からFisher vector\cite{fisher_vector}を用いて高次特徴を生成する．
+    最後に，生成された高次特徴からその動作種類を識別する．
+    }
+\label{fig:overview}
+\end{figure}
+
+\newpage
+
+\subsection{局所特徴の生成}
+\label{sec:method/local_feat}
+
+本節では，提案手法における局所特徴の生成について述べる．
+本研究では，局所特徴群を生成するための手法としてtrajectory-pooled deep-convolutional descriptors (TDD)\cite{TDD}を採用する．
+TDDは，dense trajectories\cite{wang2011, IDT}とconvolutional neural networks (CNN)\cite{CNN}を組み合わせた手法である．
+Dense trajectoriesは特徴の抽出に身体部位の検出などを必要としないため，カメラ運動等に頑健である．
+Dense trajectoriesは局所特徴としてhistograms of oriented optical flow(HOOF)\cite{HOGHOF}やhistogram of oriented gradients(HoG)\cite{HOG}を用いていたが，
+TDDはこれらに変わりCNNにより動作認識に効果的な特徴量を学習した上で使用することができる．
+TDDの概要を図\ref{fig:tdd_overview}に示す．
+本節では，まずTDDのベースとなる手法としてdense trajectoriesについて説明する．
+次に，dense trajectoriesとCNNを組み合わせてTDDを生成する方法について述べる．
+
+\begin{figure}
+\begin{center}
+    \includegraphics[width=\linewidth]{images/tdd_overview.ai}
+\end{center}
+\caption[trajectory-pooled deep-convolutional descriptorsの概要]{
+trajectory-pooled deep-convolutional descriptors(TDD)の概要 (\cite{TDD}より)．
+TDDでは，まずdense trajectories\cite{wang2011}を用いて特徴点を追跡した軌跡を生成する．
+一方，入力の画像とそのoptical flowから多層ニューラルネットを用いて特徴マップを生成する．
+この特徴マップをdense trajectoriesを用いて抽出することで各特徴点に対応する特徴量を生成する．
+}
+\label{fig:tdd_overview}
+\end{figure}
+
+
+\subsubsection{Dense trajectories}
+
+Dense trajectoriesは映像中での動作認識において広く使われてきた特徴表現であり，映像中の特徴点群の軌跡に沿って局所特徴を抽出する手法である．
+
+Dense trajectoriesでは，時間間隔$s_t$で以下のような特徴点群$\mathbb P$を生成する．
+$$
+\mathbb P = \{P_k \ | k = 1, 2, ..., K'\}
+P_k = (x_k, y_k) \in \mathbb R^2
+$$
+ここで，$K'$は生成された全特徴量の数である．
+
+
+特徴点群は，一定の間隔$s_p$で映像中にグリッド上に配置される．
+抽出された特徴点群は，optical flow\cite{Horn81determiningoptical}のマップに従ってその位置を更新するが，
+模様のない壁などではoptical flowが計算できないため，初期位置がそのような場所に配置された特徴点群は追跡することができない．
+そこで，生成された特徴点群のうち追跡可能な領域にあるものを選定し，それ以外は追跡せずに破棄する．
+
+特徴点群の初期位置が追跡可能な領域にあるかどうか判定するためには，Good Features to Track\cite{good_features_to_track}で提案された手法を利用する．
+この手法ではまず，特徴点の周囲の正方形の近傍領域$S(p)$に対して勾配行列$M$を以下のように計算する．
+$$
+M = \left(
+    \begin{array}{cc}
+      \sum_{S(p)} (dI/dx)^2 & \sum_{S(p)} (dI/dx dI/dy)  \\
+      \sum_{S(p)} (dI/dx dI/dy) & \sum_{S(p)} (dI/dy)^2  \\
+    \end{array}
+  \right)
+$$
+この特徴点行列$M$の最小固有値が一定の閾値以上であるかどうかで，与えられた特徴点が追跡可能な領域であるかどうか判定する．
+
+生成された特徴点は，入力映像の動きを追跡するようにその位置を更新する．
+特徴点$P_t = (x_t, y_t) \in \mathbb R^2$の更新式は，入力映像のoptical flowの場$\omega = (u_t, v_t)$(図\ref{fig:method-optical-flow})を用いて以下のように表される．
+
+\begin{equation}
+P_{t+1} = (x_{t+1}, y_{t+1}) = (x_t, y_t) + (M * \omega) | _{(\overline x_t, \overline y_t)}
+\end{equation}
+
+ここで$M$はメジアンフィルタのカーネル，$(\overline x_t, \overline y_t)$は整数に丸められた座標値である．
+この更新式により，optical flowのベクトルの示す方向に移動する形で特徴点の軌跡(trajectories)が得られる．
+特徴点群$\mathbb P$は，$p$フレームの間更新され，長さ$p$の軌跡$T$を生成する．
+
+このようにして，与えられた映像から軌跡の集合であるDense trajectories
+\[
+    \mathbb T = \{T_1, T_2, .., T_K\}
+\]
+を生成する．Kは軌跡の数であり，k番目の軌跡は
+\[
+    T_k = \{(x_1^k, y_1^k, t_1^k), (x_2^k, y_2^k, t_2^k), ... ,(x_p^k, y_p^k, t_p^k)\}
+\]
+と表される．
+$(x^k_p, y^k_p, t^k_p) \in \mathbb R^3$は軌跡$T_k$の$p$番目の位置と時間である．
+映像から生成されたDense trajectoriesの例を図\ref{fig:trajectories}に示す．
+
+Dense trajectoiresの周囲の局所特徴を抽出することで各軌跡に対して一つの特徴ベクトルが計算される．
+従来のdense trajectoriesではhistograms of oriented gradients(HoG)\cite{HOG}, histgrams of oriented optical flow(HOOF)\cite{HOGHOF}, motion boundary histogram(MBH)\cite{MBH}等の局所特徴を集めていた．
+それに対してTDDでは，CNNの中間データとして得られる特徴マップをdense trajectoriesで抽出する．
+
+\begin{figure}
+\begin{center}
+    \includegraphics[width=\linewidth]{images/method-optical-flow.ai}
+\end{center}
+\caption[Optical flow場の例]{
+    Optical flow場\cite{Horn81determiningoptical}の例．
+    4ピクセルごとに，その座標におけるoptical flowのベクトルを青線で描画した．
+    このベクトルに応じて特徴点の位置の更新式を得る．
+    }
+\label{fig:method-optical-flow}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+    \includegraphics[width=\linewidth]{images/trajectories.ai}
+\end{center}
+\caption[生成されたdense trajectoriesの例]{生成されたdense trajectoriesの例．収録したデータセット(第\ref{sec:dataset}章参照)の``指差し",``呼びかけ",``考える"の3つの動作サンプルを，9フレームごとに可視化した．赤が特徴点の座標，緑が特徴点の軌跡である． }
+\label{fig:trajectories}
+\end{figure}
+
+\subsubsection{Trajectory-Pooled Deep-Convolutional Descriptors}
+
+TDDでは，CNNを用いて映像から特徴マップを生成する．
+CNNを用いた特徴マップの生成は，two-stream convolutional neural networks (TCNN)\cite{TCNN}で提案された手法を用いて行われる．
+
+TCNNでは，入力映像の各フレーム画像と各フレームのoptical flowマップにそれぞれCNNを適用することで，多層ニューラルネットワークの枠組みで見えの情報と動きの情報を両方加味した学習を行うことができる．
+この時に用いる二つのCNNを，それぞれspatial netとtemporal netと定義する．
+TDDでは，この二つのCNNの中間層に現れる特徴マップを用いることで，CNNを特徴抽出器として用いる．
+映像$V$を入力として生成される特徴マップは，以下のように表される．
+\[
+\mathbb C (V) = \{ C^s_1, C^s_2, ..., C^s_M, C^t_1, C^t_2, ..., C^t_M \}
+\]
+ここで $C^s_m \in \mathbb R ^ { H_m \times W_m \times L \times N_m } $は$m$番目のspatial netに現れる特徴マップであり，$H_m$は高さ，$W_m$は幅，$L$は映像のフレーム数，$N_m$はチャネル数である．
+同様に，$C^t_m \in \mathbb R ^ { H_m \times W_m \times L \times N_m } $は$m$番目のtemporal netに現れる特徴マップである．
+
+抽出された特徴マップの例を図\ref{fig:method-fmap}に示す．
+このようにして得られる特徴マップの一要素$  C^a_m $に対して，軌跡$T_k$によって生成される特徴量は以下のように表される．
+$$
+D(T_k, C^a_m) = \sum^P_{p=1} C ^a_m (\overline { (r_m \times x^k_p), (r_m \times y^k_p), z^k_p})
+$$
+$(x^k_p, y^k_p, z^k_p)$は軌跡$T_k$の$p$番目の位置であり，$r_m$は$m$番目の特徴マップと入力映像のサイズ比である．
+また，$a \in \{s, t\}$はspatial netかtemporal netのいずれかを表す．
+
+このようにして，それぞれの特徴点の軌跡$T_k$に対して特徴
+$$
+D(T_k) = \{D(T_k, C^s_1), D(T_k, C^s_2), ..., D(T_k, C^s_M), D(T_k, C^t_1), D(T_k, C^t_2), ..., D(T_k, C^t_M)\}
+$$
+を得ることができる．
+TDDでは，この$D(T_k)$局所特徴として識別タスクに利用する．
+
+\begin{figure}
+\begin{center}
+    \includegraphics[width=\linewidth]{images/fmap.ai}
+\end{center}
+\caption[多層ニューラルネットにより抽出された特徴マップの例] {
+多層ニューラルネットにより抽出された特徴マップの例.
+入力された映像とoptical flowからconvolutional neural networks(CNN)\cite{CNN}により抽出された特徴の例を示す．
+左から数えて1列目は入力の映像を示す．
+2列目はspatial netにより入力映像から抽出された特徴マップの512チャネルのうち一つを可視化したものである．
+特徴マップにはspatial netの6層目の出力を用いた．
+3列目は入力の映像から生成されたoptical flowを示す．
+4ピクセルごとに，optical flowのベクトルを水色の線で可視化した．
+4列目は，temporal netによりoptical flowから抽出された特徴マップの512チャネルのうち一つを可視化したものである．
+特徴マップにはtemporal netの5層目の出力を用いた．
+}
+\label{fig:method-fmap}
+\end{figure}
+
+
+\subsection{視線情報を用いた局所特徴の重み付け}
+\label{sec:method/gaze}
+
+提案手法では，二人称視点映像の記録者の視線位置を用いることで局所特徴に対して重み付けを行う．
+視線位置を用いた局所特徴選択の概要を図\ref{fig:gaze_overview}に示す．
+
+\begin{figure}[p]
+\begin{center}
+    \includegraphics[width=\linewidth]{images/gaze_overview.ai}
+\end{center}
+\caption[視線情報を用いた局所特徴選択の概要]
+{視線情報を用いた局所特徴選択の概要．
+赤線は視線の軌跡を示す．
+緑線は重み付け対象の局所特徴の軌跡を示す．
+視線位置から半径$r$の領域を{\bf 視線領域}と定義する．
+局所特徴が視線領域内にある時間$n$を視線領域との{\bf 重複時間}と定義する．
+この重複時間$n$が一定の閾値$q$以上であれば重み$w = 1$，そうでなければ重み$w = 0$とすることで，視線の周りの局所特徴を選択する. }
+\label{fig:gaze_overview}
+\end{figure}
+
+\ref{sec:method/local_feat}節で取り上げた手法により入力映像映像全体から生成された局所特徴の集合を以下のように定義する．
+\begin{equation}
+    X = \{\bm x_n | n = 1, 2, ..., N\} \;  (\bm x_n \in \mathbb R ^ d )
+\end{equation}
+$N$は生成された全局所特徴の総数，dは局所特徴の次元数である．
+
+
+それぞれの$X$のn番目の局所特徴$x_n$について，対応するの軌跡のtフレーム目での位置を$\bm l_n(t) \in \mathbb R ^ 2$とおく．
+一方で，そのフレームでの視線位置を$\bm l_g(t) \in \mathbb R ^ 2$とおく．
+それぞれの局所特徴の視線との位置関係
+\begin{equation}
+    \bm v_n(t) = \bm l_n(t) - \bm l_g(t)
+\end{equation}
+について，$v_n(t)$の軌跡を以下のように表す．
+\begin{equation}
+    V_n = (\bm v_n(1), \dots, v_n(T) )
+\end{equation}
+
+この$V$に対して，以下のような関数$f$を定義する．
+
+\begin{eqnarray}
+f(V)=\left\{ \begin{array}{ll}
+1 & (g(V, r) \ge q) \\
+0 & (g(V, r) < q) \\
+\end{array}
+\right.
+\end{eqnarray}
+
+ここで，$g(V_n, r)$は，軌跡$V$の要素$\bm v_n(t)$の中で$|\bm v_n(t)| \le r$を満たすものの個数を表す．
+以上で定義した$V_n$, $f$を用いて，$X$の$n$番目の局所特徴$\bm x_n$の重要度$w_n$は以下のように表される．
+\begin{equation}
+\label{weight_function}
+    w_n = f(V_{n}) \ \ \  (w_n \in \mathbb R, w_n \ge 0)
+\end{equation}
+
+提案手法では，視線位置から半径$r$以内の領域を``視線領域"と定義し，$g(V_n, r)$を特徴点の軌跡と視線領域の``重複時間"と定義する．
+$w_n$は局所特徴$\bm x_n$の中で視線領域との重複時間が一定の閾値以上であるものを選択する働きを持つ．
+$r$は，視線領域をどの程度広くするかを決めるパラメタあり，$r = \infty$の場合には全ての局所特徴から高次特徴を生成する従来手法に対応する．
+$q$は局所特徴$\bm x_n$と視線領域の重複時間が何フレーム以上であればその局所特徴を選択するかを決めるパラメタである．
+これは，どの程度注視された局所特徴を選択するかを調整する働きを持ち，適切に値を設定することで映像中で視線位置が大きく動いた場合に局所特徴が過剰に選択されることを防ぐことができる．
+
+なお，視線計測機機器の誤差によりフレームから視線情報が欠落している場合は$|\bm v(t)| = \infty$, $w_n = 0$であるものとして扱った．
+この$w_n$により選択された局所特徴の例を図\ref{fig:filtering_trajectories}に示す．
+
+以上で定義された各局所特徴の重み
+
+\begin{equation}
+    W = \{ w_n | n = 1, ..., N \}
+\end{equation}
+を用いて，局所特徴を選択しつつ高次特徴を生成する．
+
+\begin{figure}
+\hspace{-2cm}
+\includegraphics[width=18.5cm]{images/filtering_trajectories.ai}
+\caption[視線による局所特徴の重み付けの結果]
+{視線による局所特徴の重み付けの結果．
+1, 2列目では{\bf 指差し}の動作について，3, 4列目では{\bf 呼びかけ}の動作について重み付けを可視化した．
+1列目，3列目は重み付けされる前のすべての局所特徴に対応するdense trajectoriesを描画している．
+それに対して2列目，4列目は重み付けされた結果$w = 1$となった局所特徴に対応するdense trajectoriesのみを描画している．
+図中の赤丸は特徴点の位置を，緑線は特徴点の軌跡を，青丸は視線位置をそれぞれ表す．
+いずれの例も，背景部分や他の人物による局所特徴の影響が抑えられていることを確認できる. }
+
+\label{fig:filtering_trajectories}
+\end{figure}
+
+\newpage
+
+\subsection{高次特徴の生成}
+
+提案手法では，局所特徴群から高次特徴量を生成するためのコーディング手法としてFisher vector \cite{fisher_vector}を採用する．
+Fisher vectorを用いることにより，線形識別器による効率的な学習が可能となる．
+本節では，局所特徴群からのFisher vectorの生成について説明する．
+
+\subsubsection{重みを考慮したGaussian mixture modelの学習}
+
+Fisher vectorでは，まず教師データの映像サンプルから局所特徴を生成し，その局所特徴の生成モデルをGaussian mixture model(GMM)で学習する．
+GMMでは局所特徴$\bm x \in \mathbb R ^ d$の生成確率を以下の式で表す．
+
+\begin{equation}
+    p(\bm x | \bm\theta) = \sum_k \pi_k \mathcal N (X_n | \bm\mu_k, \Sigma_k)
+\end{equation}
+
+ここで$\mathcal N$は正規分布の確率密度関数を表す．
+$\bm\theta$ はGMMのパラメタであり，以下の式により定義される．
+\begin{equation}
+    \bm \theta = (\pi_1, ..., \pi_K, \bm \mu_1, ..., \bm \mu_K, \Sigma_1, ..., \Sigma_K)
+\end{equation}
+
+GMMの$k$番目のコンポーネントの正規分布に対して$\bm\mu_k \in \mathbb R^d$は平均を，$\Sigma_k \in \mathbb R ^{d \times 2}$は共分散行列を表す．
+$\pi_k \in [0, 1]$は$k$番目のコンポーネントに割り当てられた重みを表し，$\sum_k \pi_k = 1$となる．
+
+教師データから得られる局所特徴サンプルの集合
+\begin{equation}
+    X = \{x_n | n = 1, ..., N\}
+\end{equation}
+に最もよく合致するGMMのパラメタ$\bm\theta$は，以下の最大化問題を解くことにより求められる．
+
+\begin{equation}
+    \bm\theta = \argmax_{\bm\theta} \max_Y \prod_n \prod_k ( \pi_k \mathcal N (X_n | \bm\mu_k, \Sigma_k))^{Y_{nk}}
+\end{equation}
+
+$Y \in \{0,1\} ^ {n \times k}$は，成分$\bm y_n$が局所変数$\bm x_n$がどの正規分布から生成されたかを表す行列であり，$\bm y_n$は一つの成分が1でそれ以外は全て0のベクトルである．
+この最適化問題はEMアルゴリズムにより近似的に解くことができる．
+
+この最大化問題に対して，局所特徴の重み
+\begin{equation}
+W = \{ w_n | n = 1, ..., N \}
+\end{equation}
+を導入することで，GMMを局所変数の重みを考慮した分布$\bm\theta_w$に拡張する．
+
+\begin{equation}
+    \bm\theta_w = \argmax_{\bm\theta} \max_Y \prod_n \prod_k ( \pi_k \mathcal N (X_n | \bm\mu_k, \Sigma_k))^{Y_{nk}w_n}
+\end{equation}
+
+このように定義することで，$w_n=0$の場合は局所特徴$\bm x_n$を無視した場合のGMM，$w_n \in \mathbb{N}$の場合は局所特徴$\bm x_n$の個数を$w_n$倍に増した場合のGMMに対応させることができる．
+この重みつき学習GMMを利用してFisher vectorを計算する．
+
+\subsubsection{重みを考慮したFisher vectorの生成}
+
+前項で定義した重みつき学習GMMを用いてFisher vectorを計算する．
+
+事前に学習されたGMMのパラメタ $\bm\theta$ に対して, サンプル$X$から生成されるFisher vector $\mathcal G_{\bm\theta}^{X}$は以下のように求められる．
+\begin{equation}
+    \mathcal G_{\bm \theta}^{X} = L_{\bm\theta} \bm s (X | \bm \theta)
+\end{equation}
+ここで，$\bm s (X | \bm\theta)$はサンプル$X$の対数尤度勾配であり，以下のように定義される．
+\begin{equation}
+    \bm s (X|\bm\theta) = \nabla_{\bm\theta} \log p (X|\bm\theta)
+\end{equation}
+また，$L_\theta$はFisher情報行列
+\begin{equation}
+    F_{\bm\theta} = E_X[\bm s(X|\bm\theta)\bm s(X|\bm\theta)^{\mathrm T}]
+\end{equation}
+について，以下の式が成り立つような行列であり，GMMの分布$\bm\theta$に対応して一意に定まる．
+\begin{equation}
+    L_{\bm\theta}^{T}L_{\bm\theta} = F_{\theta}
+\end{equation}
+
+本研究ではこの対数尤度勾配$\bm s (X|\bm\theta)$を局所特徴の重みを考慮できるように拡張することで，視線情報を考慮した高次特徴量を生成する．
+
+サンプル$X$の尤度$p(X|\bm\theta)$は以下のように$X$に含まれる各サンプルの生成確率$p(\bm x_n|\bm\theta)$の積を用いて以下のように求められる．
+\begin{equation}
+    p(X|\bm\theta) = \prod_{n=1}^N p(\bm x_n|\bm\theta)
+\end{equation}
+この尤度に局所特徴の重要度$W$を加味して以下のように拡張する．
+
+\begin{equation}
+    p_w(X, W, \bm\theta) = \prod_{n=1}^N p(\bm x_n|\bm\theta)^{w_n}
+\end{equation}
+
+このように定義することで，$w_n=0$の場合は局所特徴$\bm x_n$を無視した尤度，$w_n \in \mathbb{N}$の場合は局所特徴$\bm x_n$の個数を$w_n$倍に増した場合の尤度に対応させることができる．
+この重み付け尤度の定義を用いることで，視線情報を加味した重み付け対数尤度勾配$\bm s (X, W|\bm\theta)$は以下のように求められる．
+\begin{align*}
+    \bm s(X, W|\bm\theta) & = \nabla_{\bm\theta} \log p_w (X, W|\bm\theta) \\
+                          & = \nabla_{\bm\theta} \log \prod_{n=1}^N p(\bm x | \bm\theta)^{w_n} \\
+                          & = \nabla_{\bm\theta} \sum_{n=1}^N w_n \log p(\bm x | \bm\theta)
+\end{align*}
+
+最終的に，視線情報を加味した重み付けFisher vector $\mathcal G_{\bm \theta}^{X, W}$は以下のように算出される．
+\begin{equation}
+    \mathcal G_{\bm \theta}^{X, W} = L_{\bm\theta} \bm s(X, W|\bm\theta)
+\end{equation}
+
+提案手法では，この重み付けFisher vectorを用いることにより局所特徴量から高次特徴を生成する．
+
+\newpage

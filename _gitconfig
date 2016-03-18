@@ -1,0 +1,26 @@
+[user]
+	name = s.murakami
+	email = smurakami.84@gmail.com
+[color]
+	ui = true
+[alias]
+	co = checkout
+	st = status
+	br = branch
+	cm = commit
+  aa = add --all .
+  # rh = reset --hard
+	hist = log --graph --date-order -C -M --pretty=format:\"<%h> %ad [%an] %Cgreen%d%Creset %s\" --all --date=short
+[push]
+	default = matching
+[core]
+	excludesfile = /Users/smurakami/.gitignore_global
+	editor = vim -c \"set fenc=utf-8\"
+[filter "media"]
+	clean = git-media-clean %f
+	smudge = git-media-smudge %f
+[filter "hawser"]
+	clean = git hawser clean %f
+	smudge = git hawser smudge %f
+	required = true
+

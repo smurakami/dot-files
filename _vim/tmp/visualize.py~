@@ -1,0 +1,150 @@
+#coding: utf-8
+import os
+import cv2
+import commands
+from skimage.io import ImageCollection
+import glob
+from tools import *
+
+
+def playVideo(loop, video, dirname):
+    for frame, image in enumerate(video):
+        image = loop(frame, image)
+        cv2.imshow("image", image[:, :, ::-1])
+        cv2.waitKey(33)
+
+
+def saveVideo(loop, video, dirname):
+    if not os.path.exists('out_video'):
+        commands.getoutput('mkdir out_video')
+
+    out_video_name = \
+        "out_video/" + dirname.replace('/', '_').replace('.', '_') + ".avi"
+    size = (320, 180)
+    fps = 30
+    videoWriter = cv2.VideoWriter(
+        out_video_name,
+        cv2.cv.CV_FOURCC('I', '4', '2', '0'), fps, size)
+    for frame, image in enumerate(video):
+        image = loop(frame, image)
+        videoWriter.write(image[:, :, ::-1])
+
+    mp4_name = out_video_name.replace('.avi', '.mp4')
+    os.system('rm %s' % mp4_name)
+    os.system('ffmpeg -i %s %s' % (out_video_name, mp4_name))
+    os.system('rm %s' % out_video_name)
+    return mp4_name
+
+
+class Container:
+    pass
+
+
+def visualize(dirname, options):
+    '''load data'''
+    traj = Traj(dirname)
+    ppm_dir = os.path.join(dirname, "frames")
+    video = ImageCollection(ppm_dir + "/*.ppm")
+    height, width, _ = video[0].shape
+    gaze = loadGaze(dirname, width, height)
+
+    '''visualize'''
+
+    filter_mask = np.load(os.path.join(dirname, 'filter_mask.npy'))
+
+    if options.traj:
+        if options.filter:
+            traj = Traj(info_csv=traj.info_csv[filter_mask], traj=traj.traj[filter_mask])
+        else:
+            traj = Traj(info_csv=traj.info_csv[filter_mask], traj=traj.traj)
+
+    container = Container()
+    container.prev_image = None
+    
+
+    def loop(frame_idx, image):
+        image_ = image.copy()
+        prev_image = container.prev_image
+
+        if options.dark:
+            image = (image * 0.25).astype(np.uint8)
+
+        if options.traj:
+            pos, path_list = traj.getCurrentLoc(frame_idx)
+
+            for path in path_list:
+                for a, b in zip(path, path[1:]):
+                    a = a.astype(int)
+                    b = b.astype(int)
+                    cv2.line(image, tuple(a), tuple(b), (255, 0, 0), 1, cv2.CV_AA)
+
+            for p in pos:
+                cv2.circle(image, (int(p[0]), int(p[1])), 1, (0, 255, 0), 1, cv2.CV_AA)
+
+        if options.flow and prev_image != None:
+            prev_g = cv2.cvtColor(prev_image, cv2.cv.CV_RGB2GRAY)
+            current_g = cv2.cvtColor(image_, cv2.cv.CV_RGB2GRAY)
+            flow = cv2.calcOpticalFlowFarneback(prev_g, current_g, 0.5, 3, 15, 3, 5, 1.2, 0)
+
+            step = 4
+            color = (0, 0, 255)
+            if options.dark:
+                color = (0, 255, 255)
+            for y in range(0, height - step, step):
+                for x in range(0, width - step, step):
+                    cv2.line(image, (x, y),
+                            (x + int(flow[y, x][0]), y + int(flow[y, x][1])), color, 1, cv2.CV_AA)
+
+        if options.gaze:
+            gaze_pos = gaze[frame_idx]
+            cv2.circle(image, (int(gaze_pos[0]), int(gaze_pos[1])), 10, (0, 255, 255), 2, cv2.CV_AA)
+            gaze_pos = gaze[frame_idx]
+
+        container.prev_image = image_
+
+        return image
+
+    if options.play:
+        playVideo(loop, video, dirname)
+    out_name = saveVideo(loop, video, dirname)
+    return out_name
+
+
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(description='hello')
+    parser.add_argument('-i', '--input', nargs='+', required=True)
+    parser.add_argument('-o', '--output', required=True)
+    parser.add_argument('-p', '--play', action='store_true')
+    parser.add_argument('-t', '--traj', action='store_true')
+    parser.add_argument('--flow', action='store_true')
+    parser.add_argument('-g', '--gaze', action='store_true')
+    parser.add_argument('-f', '--filter', action='store_true')
+    parser.add_argument('-d', '--dark', action='store_true')
+    parser.add_argument('--shuffle', action='store_true')
+    args = parser.parse_args()
+
+    out_videos = []
+    for dirname in sorted(args.input):
+        print dirname
+        out_name = visualize(dirname, args)
+        out_videos.append(out_name)
+
+
+    if args.shuffle:
+        import random
+        random.shuffle(out_videos)
+
+    os.system('ffmpeg -i %s -filter_complex "concat=n=%d:v=1:a=0" %s' % (
+              ' -i '.join(out_videos),
+              len(out_videos),
+              args.output
+              ))
+
+    os.system('rm %s' % ' '.join(out_videos))
+
+
+main()
+

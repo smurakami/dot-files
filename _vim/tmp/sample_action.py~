@@ -1,0 +1,16 @@
+import glob
+import random
+import commands
+
+
+def main():
+    for action in range(12):
+        files_all = glob.glob('out_video_all/*data*actions*action_%02d_*.mp4' % action)
+        print len(files_all)
+        files = sorted(random.sample(files_all, 20))
+        args = ' '.join(["-i %s" % f for f in files])
+        commands.getoutput("ffmpeg %s -filter_complex 'concat=n=%d:v=1:a=0' action_%02d.mp4" % (args, len(files), action))
+
+
+main()
+

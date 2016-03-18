@@ -1,0 +1,83 @@
+#coding: utf-8
+import os
+import numpy as np
+import json
+from skimage.io import ImageCollection
+
+
+class Traj:
+    def __init__(self, dirname=None, info_csv=[], traj=[]):
+        self.info_csv = np.array(info_csv)
+        self.traj = np.array(traj)
+
+        if dirname:
+            self.load(dirname)
+
+
+    def load(self, dirname):
+        info_csv = []
+        for line in open(dirname + '/traj.csv'):
+            info_csv.append(line)
+
+        filename = [line.split(',')[0] for line in info_csv]
+        filename = [os.path.basename(f) for f in filename]
+        filename = [os.path.join(dirname + '/traj', f) for f in filename]
+
+        traj = [json.loads(json.load(open(f))) for f in filename]
+
+        self.traj = np.array(traj)
+        self.info_csv = np.array(info_csv)
+
+        return info_csv, traj
+
+    def getCurrentLoc(self, time):
+        traj = self.traj
+        loc = np.array([t['loc'] for t in traj])
+        first_frame = np.array([t['first_frame'] for t in traj])
+        length = np.array([t['length'] for t in traj])
+        mask = (first_frame <= time) & (time < first_frame + length)
+        index = (time - first_frame)
+        pos = [l[i] for l, i in zip(loc[mask], index[mask])]
+        path = [l[:i] for l, i in zip(loc[mask], index[mask])]
+        return np.array(pos), path
+
+    def filter(self, _gaze, radius, overlap):
+        first_frame = self.first_frame()
+        length = np.array([t['length'] for t in self.traj])
+ 
+        loc  = np.array([t['loc'] for t in self.traj])
+        gaze = np.array([_gaze[f : f + l] for f, l in zip(first_frame, length)])
+        dist = np.sqrt(((loc - gaze) ** 2).sum(-1))
+ 
+        mask = (dist < radius).sum(1) >= overlap
+        return mask
+
+    def first_frame(self):
+        return np.array([t['first_frame'] for t in self.traj])
+
+    def first_pos(self):
+        return np.array([t['loc'][0] for t in self.traj])
+
+
+def loadGaze(dirname, width, height):
+    gaze_file = os.path.join(dirname, 'gaze.csv')
+    with open(gaze_file) as f:
+        xs = []
+        ys = []
+        for line in f:
+            elems = line.replace('\n', '').split(',')
+            xs.append(float(elems[2]) * width)
+            ys.append(float(elems[3]) * height)
+        return np.vstack([xs, ys]).T
+
+
+def loadMask(dirname):
+    mask_file = os.path.join(dirname, "masks.csv")
+    for line in open(mask_file):
+        tokens = line.replace('\n', '').split(',')
+        break
+
+    mask = tokens[2:6]
+    mask = np.array(mask).astype(np.int)
+
+    return mask

@@ -1,0 +1,360 @@
+@inproceedings{alletto2014_383,
+  author = {Alletto, Stefano and Serra, Giuseppe and Calderara, Simone and Solera, Francesco and Cucchiara, Rita},
+  title = {From Ego to Nos-vision: Detecting Social Relationships in First-Person Views},
+  booktitle = {Proc. of 3rd Workshop on Egocentric (First-person) Vision},
+  volume = {},
+  number = {},
+  year = 2014,
+  month = jun,
+  pages = {},
+  address = {Columbus, Ohio},
+}
+
+@inproceedings{FathiHR12,
+  added-at = {2012-08-16T00:00:00.000+0200},
+  author = {Fathi, Alireza and Hodgins, Jessica K. and Rehg, James M.},
+  biburl = {http://www.bibsonomy.org/bibtex/261a9a2222b6b0649ab5041a6b241b2fc/dblp},
+  booktitle = {CVPR},
+  ee = {http://doi.ieeecomputersociety.org/10.1109/CVPR.2012.6247805},
+  interhash = {388cede96975f068e57386b0ded15721},
+  intrahash = {61a9a2222b6b0649ab5041a6b241b2fc},
+  isbn = {978-1-4673-1226-4},
+  keywords = {dblp},
+  pages = {1226-1233},
+  publisher = {IEEE},
+  timestamp = {2012-08-17T11:33:46.000+0200},
+  title = {Social interactions: A first-person perspective.},
+  url = {http://dblp.uni-trier.de/db/conf/cvpr/cvpr2012.html#FathiHR12},
+  year = 2012
+}
+
+@Article{park_nips:2012,
+  author = {Hyun Soo Park and Eakta Jain and Yaser Sheikh},
+  title = {3D Gaze Concurrences From Head-mounted Cameras},
+  booktitle = {Advances in Neural Information Processing Systems},
+  month = {December},
+  year = {2012}
+}
+
+@incollection{shapovalova,
+  title = {action is in the eye of the beholder: eye-gaze driven model for spatio-temporal action localization},
+  author = {Shapovalova, Nataliya and Raptis, Michalis and Sigal,Leonid and Mori, Greg},
+  booktitle = {advances in neural information processing systems 26},
+  editor = {c.j.c. burges and l. bottou and m. welling and z. ghahramani and k.q. weinberger},
+  pages = {2409--2417},
+  year = {2013},
+  publisher = {curran associates, inc.},
+  url = {http://papers.nips.cc/paper/5197-action-is-in-the-eye-of-the-beholder-eye-gaze-driven-model-for-spatio-temporal-action-localization.pdf}
+}
+
+@inproceedings{Fathi:2012,
+  author = {Fathi, Alireza and Li, Yin and Rehg, James M.},
+  title = {Learning to Recognize Daily Actions Using Gaze},
+  booktitle = {Proceedings of the 12th European Conference on Computer Vision - Volume Part I},
+  series = {ECCV'12},
+  year = {2012},
+  isbn = {978-3-642-33717-8},
+  location = {Florence, Italy},
+  pages = {314--327},
+  numpages = {14},
+  url = {http://dx.doi.org/10.1007/978-3-642-33718-5_23},
+  doi = {10.1007/978-3-642-33718-5_23},
+  acmid = {2402964},
+  publisher = {Springer-Verlag},
+  address = {Berlin, Heidelberg},
+}
+
+@inproceedings{kiwon_cvpr13_gaze,
+  title={Studying Relationships Between Human Gaze, Description, and Computer Vision},
+  author={Kiwon Yun and Yifan Peng and Dimitris Samaras and Gregory J. Zelinsky and Tamara L. Berg},
+  booktitle={Computer Vision and Pattern Recognition (CVPR), 2013 IEEE Computer Society Conference on},
+  year={2013},
+  organization={IEEE}
+}
+
+@inproceedings{wang2011,
+  AUTHOR = {Heng Wang and Alexander Kl{\"a}ser and Cordelia Schmid and Cheng-Lin Liu},
+  TITLE = {{Action Recognition by Dense Trajectories}},
+  BOOKTITLE = {IEEE Conference on Computer Vision \& Pattern Recognition},
+  YEAR = {2011},
+  MONTH = Jun,
+  PAGES = {3169-3176},
+  ADDRESS = {Colorado Springs, United States},
+  URL = {http://hal.inria.fr/inria-00583818/en}
+}
+
+@INPROCEEDINGS{Andrews03supportvector,
+    author = {Stuart Andrews and Ioannis Tsochantaridis and Thomas Hofmann},
+    title = {Support vector machines for multiple-instance learning},
+    booktitle = {Advances in Neural Information Processing Systems 15},
+    year = {2003},
+    pages = {561--568},
+    publisher = {MIT Press}
+}
+
+@inproceedings{Yonetani2015,
+  AUTHOR = {Yonetani and Kitani and Sato},
+  TITLE = {Ego-Surfing First Person Videos},
+  BOOKTITLE = {CVPR},
+  YEAR = {2015},
+}
+
+@ARTICLE{Horn81determiningoptical,
+  author = {Berthold K. P. Horn and Brian G. Schunck},
+  title = {Determining Optical Flow},
+  journal = {ARTIFICAL INTELLIGENCE},
+  year = {1981},
+  volume = {17},
+  pages = {185--203}
+}
+
+
+@inproceedings{Farneback:2003:TME:1763974.1764031,
+author = {Farneb\"{a}ck, Gunnar},
+title = {Two-frame Motion Estimation Based on Polynomial Expansion},
+booktitle = {Proceedings of the 13th Scandinavian Conference on Image Analysis},
+series = {SCIA'03},
+year = {2003},
+isbn = {3-540-40601-8},
+location = {Halmstad, Sweden},
+pages = {363--370},
+numpages = {8},
+url = {http://dl.acm.org/citation.cfm?id=1763974.1764031},
+acmid = {1764031},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+} 
+
+@inproceedings{Lucas-kanade,
+ author = {Lucas, Bruce D. and Kanade, Takeo},
+ title = {An Iterative Image Registration Technique with an Application to Stereo Vision},
+ booktitle = {Proceedings of the 7th International Joint Conference on Artificial Intelligence - Volume 2},
+ series = {IJCAI'81},
+ year = {1981},
+ location = {Vancouver, BC, Canada},
+ pages = {674--679},
+ numpages = {6},
+ url = {http://dl.acm.org/citation.cfm?id=1623264.1623280},
+ acmid = {1623280},
+ publisher = {Morgan Kaufmann Publishers Inc.},
+ address = {San Francisco, CA, USA},
+}
+
+@inproceedings{HOG,
+  author       = "Navneet Dalal and Bill Triggs",
+  title        = "Histograms of Oriented Gradients for Human Detection",
+  booktitle    = "International Conference on Computer Vision \& Pattern Recognition",
+  volume       = "2",
+  pages        = "886-893",
+  month        = "June",
+  year         = "2005",
+  editor       = "Cordelia Schmid and Stefano Soatto and Carlo Tomasi",
+  address      = "INRIA Rh\^one-Alpes, ZIRST-655, av. de l'Europe, Montbonnot-38334",
+  keywords     = "LEAR, ACEMEDIA, LAVA",
+  url          = "http://lear.inrialpes.fr/pubs/2005/DT05"
+}
+
+@inproceedings{MBH,
+  TITLE = {{Human Detection Using Oriented Histograms of Flow and Appearance}},
+  AUTHOR = {Dalal, Navneet and Triggs, Bill and Schmid, Cordelia},
+  URL = {https://hal.inria.fr/inria-00548587},
+  BOOKTITLE = {{European Conference on Computer Vision (ECCV '06)}},
+  ADDRESS = {Graz, Austria},
+  EDITOR = {Ales Leonardis and Horst Bischof and Axel Pinz},
+  PUBLISHER = {{Springer-Verlag}},
+  SERIES = {Lecture Notes in Computer Science (LNCS)},
+  VOLUME = {3952},
+  PAGES = {428--441},
+  YEAR = {2006},
+  MONTH = May,
+  DOI = {10.1007/11744047\_33},
+  PDF = {https://hal.inria.fr/inria-00548587/file/DTS06.pdf},
+  HAL_ID = {inria-00548587},
+  HAL_VERSION = {v1},
+}
+
+@InProceedings{HOGHOF,
+  author       = "Ivan Laptev and Marcin Marsza{\l}ek and Cordelia Schmid and Benjamin Rozenfeld",
+  title        = "Learning Realistic Human Actions from Movies",
+  booktitle    = "Conference on Computer Vision \& Pattern Recognition",
+  month        = "jun",
+  year         = "2008",
+  keywords     = "LEAR",
+  url          = "http://lear.inrialpes.fr/pubs/2008/LMSR08"
+}
+
+@article{fisher_vector,
+  author = {Sanchez, Jorge and Perronnin, Florent and Mensink, Thomas and Verbeek, Jakob},
+  title = {Image Classification with the Fisher Vector: Theory and Practice},
+  journal = ijcv,
+  year = {2013},
+  pdf  = pubroot # {sanchez13ijcv.pdf},
+  png  = pubroot # {sanchez13ijcv.png},
+  gsid = {11977792362213765680},
+}
+
+@incollection{CNN,
+title = {ImageNet Classification with Deep Convolutional Neural Networks},
+author = {Alex Krizhevsky and Sutskever, Ilya and Geoffrey E. Hinton},
+booktitle = {Advances in Neural Information Processing Systems 25},
+editor = {F. Pereira and C.J.C. Burges and L. Bottou and K.Q. Weinberger},
+pages = {1097--1105},
+year = {2012},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf}
+}
+
+@article{TDD,
+  author    = {Limin Wang and
+               Yu Qiao and
+               Xiaoou Tang},
+  title     = {Action Recognition with Trajectory-Pooled Deep-Convolutional Descriptors},
+  journal   = {CoRR},
+  volume    = {abs/1505.04868},
+  year      = {2015},
+  url       = {http://arxiv.org/abs/1505.04868},
+  timestamp = {Mon, 01 Jun 2015 14:13:54 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/Wang0T15},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@InProceedings{BOF_1,
+   author = "Sivic, J. and Zisserman, A.",
+   title = "{Video Google}: {A} Text Retrieval Approach to
+   Object Matching in Videos",
+   booktitle = "Proceedings of the International Conference on Computer Vision",
+   month = oct,
+   volume = "2",
+   pages = "1470--1477",
+   year = "2003",
+   URL = "http://www.robots.ox.ac.uk/~vgg",
+}
+
+@INPROCEEDINGS{BOF_2,
+    author = {Gabriella Csurka and Christopher R. Dance and Lixin Fan and Jutta Willamowski and Cédric Bray},
+    title = {Visual categorization with bags of keypoints},
+    booktitle = {In Workshop on Statistical Learning in Computer Vision, ECCV},
+    year = {2004},
+    pages = {1--22}
+}
+
+@inproceedings{improved_fisher,
+ author = {Perronnin, Florent and S\'{a}nchez, Jorge and Mensink, Thomas},
+ title = {Improving the Fisher Kernel for Large-scale Image Classification},
+ booktitle = {Proceedings of the 11th European Conference on Computer Vision: Part IV},
+ series = {ECCV'10},
+ year = {2010},
+ isbn = {3-642-15560-X, 978-3-642-15560-4},
+ location = {Heraklion, Crete, Greece},
+ pages = {143--156},
+ numpages = {14},
+ url = {http://dl.acm.org/citation.cfm?id=1888089.1888101},
+ acmid = {1888101},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+}
+
+@inproceedings{TCNN,
+  author    = {Karen Simonyan and
+               Andrew Zisserman},
+  title     = {Two-Stream Convolutional Networks for Action Recognition in Videos},
+  journal   = {CoRR},
+  volume    = {abs/1406.2199},
+  year      = {2014},
+  url       = {http://arxiv.org/abs/1406.2199},
+  timestamp = {Tue, 01 Jul 2014 11:58:08 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/SimonyanZ14},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@inproceedings{IDT,
+  TITLE = {{Action Recognition with Improved Trajectories}},
+  AUTHOR = {Wang, Heng and Schmid, Cordelia},
+  URL = {https://hal.inria.fr/hal-00873267},
+  BOOKTITLE = {{ICCV 2013 - IEEE International Conference on Computer Vision}},
+  ADDRESS = {Sydney, Australia},
+  PUBLISHER = {{IEEE}},
+  PAGES = {3551-3558},
+  YEAR = {2013},
+  MONTH = Dec,
+  DOI = {10.1109/ICCV.2013.441},
+  PDF = {https://hal.inria.fr/hal-00873267/file/wang_iccv13.pdf},
+  HAL_ID = {hal-00873267},
+  HAL_VERSION = {v2},
+}
+
+@InProceedings{Jammalamadaka15,
+  author       = "Jammalamadaka, N. and Zisserman, A. and Jawahar, C.~V.",
+  title        = "Human Pose Search using Deep Poselets",
+  booktitle    = "International Conference on Automatic Face and Gesture Recognition",
+  year         = "2015",
+}
+
+@InProceedings{Ni_2015_CVPR,
+author = {Ni, Bingbing and Moulin, Pierre and Yang, Xiaokang and Yan, Shuicheng},
+title = {Motion Part Regularization: Improving Action Recognition via Trajectory Selection},
+journal = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+month = {June},
+year = {2015}
+}
+
+@inproceedings{RyooM13,
+  author = {Ryoo, Michael S. and Matthies, Larry},
+  biburl = {http://www.bibsonomy.org/bibtex/206fd3b8386bac0e791565b197733a40e/dblp},
+  booktitle = {CVPR},
+  ee = {http://dx.doi.org/10.1109/CVPR.2013.352},
+  interhash = {2191653accf199c38d479682ebc2d5f8},
+  intrahash = {06fd3b8386bac0e791565b197733a40e},
+  keywords = {dblp},
+  pages = {2730-2737},
+  publisher = {IEEE},
+  timestamp = {2013-10-18T11:36:13.000+0200},
+  title = {First-Person Activity Recognition: What Are They Doing to Me?},
+  url = {http://dblp.uni-trier.de/db/conf/cvpr/cvpr2013.html#RyooM13},
+  year = 2013
+}
+
+@article{UCF101,
+  author    = {Khurram Soomro and
+               Amir Roshan Zamir and
+               Mubarak Shah},
+  title     = {{UCF101:} {A} Dataset of 101 Human Actions Classes From Videos in
+               The Wild},
+  journal   = {CoRR},
+  volume    = {abs/1212.0402},
+  year      = {2012},
+  url       = {http://arxiv.org/abs/1212.0402},
+  timestamp = {Wed, 02 Jan 2013 09:49:04 +0100},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-1212-0402},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@inproceedings{good_features_to_track,
+   author = "Jianbo Shi and Carlo Tomasi",
+   title = "Good Features to Track",
+   booktitle = "1994 IEEE Conference on Computer Vision and Pattern Recognition (CVPR'94)",
+   pages = "593 - 600",
+   year = "1994",
+}
+
+
+@article{STIP,
+ author = {Laptev, Ivan},
+ title = {On Space-Time Interest Points},
+ journal = {Int. J. Comput. Vision},
+ issue_date = {September 2005},
+ volume = {64},
+ number = {2-3},
+ month = sep,
+ year = {2005},
+ issn = {0920-5691},
+ pages = {107--123},
+ numpages = {17},
+ url = {http://dx.doi.org/10.1007/s11263-005-1838-7},
+ doi = {10.1007/s11263-005-1838-7},
+ acmid = {1085605},
+ publisher = {Kluwer Academic Publishers},
+ address = {Hingham, MA, USA},
+ keywords = {interest points, matching, scale selection, scale-space, video interpretation},
+} 
+
